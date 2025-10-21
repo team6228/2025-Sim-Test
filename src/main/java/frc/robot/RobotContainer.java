@@ -22,10 +22,12 @@ public class RobotContainer {
   public RobotContainer() {
     configureBindings();
 
-    mDriveSubsystem.setDefaultCommand(new ArcadeDriveCmd(mDriveSubsystem,() -> joystick.getX(),() ->joystick.getY()));
+    mDriveSubsystem.setDefaultCommand(new ArcadeDriveCmd(mDriveSubsystem,() -> joystick.getRawAxis(1),() ->joystick.getRawAxis(0)));
   }
 
-  private void configureBindings() {}
+  private void configureBindings() {
+    
+  }
 
   public Command getAutonomousCommand() {
     return Commands.print("No autonomous command configured");
