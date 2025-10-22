@@ -28,7 +28,7 @@ public final class ElevatorConstants {
 
     /*Encoder */
     public static final int[] kEncoderChannels = {8,9};
-    public static final boolean kEncoderReversed = false;
+    public static final boolean kEncoderReversed = true;
 
     public static final double kEncoderCPR = 1024;
     public static final double kDistancePerPulse = 2.0 * Math.PI * kElevatorDrumRadius / kEncoderCPR * 4;

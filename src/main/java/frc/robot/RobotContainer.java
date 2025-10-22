@@ -13,9 +13,11 @@ import frc.robot.Commands.ArcadeDriveCmd;
 import frc.robot.Constants.OperatorConstants;
 
 import frc.robot.Subsystems.Drive.DriveSubsystem;
+import frc.robot.Subsystems.Elevator.ElevatorSubsystem;
 
 public class RobotContainer {
   private final DriveSubsystem mDriveSubsystem = new DriveSubsystem();
+  private final ElevatorSubsystem mElevatorSubsystem = new ElevatorSubsystem();
 
   private final CommandJoystick joystick = new CommandJoystick(OperatorConstants.kJoystickPort);
 
@@ -26,7 +28,8 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    
+    //[TODO] get button from constants
+    joystick.button(1).toggleOnTrue(mElevatorSubsystem.testElevatorCmd().withTimeout(5.0));
   }
 
   public Command getAutonomousCommand() {

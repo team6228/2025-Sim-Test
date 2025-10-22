@@ -1,11 +1,13 @@
 package frc.robot.Subsystems.Elevator;
 
+import com.revrobotics.sim.SparkMaxSim;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.simulation.BatterySim;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
@@ -15,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
 import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.Command;
 
 public class ElevatorSubsystem extends SubsystemBase{
     private final SparkMaxConfig leaderConfig = new SparkMaxConfig();
@@ -46,22 +49,26 @@ public class ElevatorSubsystem extends SubsystemBase{
     0.01,
     0.0);
 
+    private final SparkMaxSim leaderSparkSim = new SparkMaxSim(leaderSpark, DCMotor.getNEO(1));
+    private final SparkMaxSim followerSparkSim = new SparkMaxSim(followerSpark, DCMotor.getNEO(1));
+
     private final EncoderSim encoderSim = new EncoderSim(encoder);
 
     private final Mechanism2d mech2d = new Mechanism2d(20,50);
-    private final MechanismRoot2d rootMech2d = mech2d.getRoot("Elevator root", 10, 0);
-    private final MechanismLigament2d elevatorMech2d = rootMech2d.append(
+    private final MechanismRoot2d mech2droot = mech2d.getRoot("Elevator root", 10, 0);
+    private final MechanismLigament2d elevatorMech2d = mech2droot.append(
         new MechanismLigament2d("Elevator", elevatorSim.getPositionMeters(), 90)
     );
 
     public ElevatorSubsystem() {
         encoder.reset();
-
         encoder.setDistancePerPulse(ElevatorConstants.kDistancePerPulse);
+
+        followerSpark.isFollower();
 
         setSparkMaxConfig();
 
-        SmartDashboard.putData("Elevator",mech2d);
+        SmartDashboard.putData("Elevator Sim",mech2d);
     }
 
     @Override
@@ -71,15 +78,24 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     @Override
     public void simulationPeriodic(){
-        //[TODO] may use sim motor 
-        elevatorSim.setInput(leaderSpark.get() * RobotController.getBatteryVoltage());
+        //[TODO] may use sim motor
+        //[TODO] may use something other than getVelocity
+        System.out.println(leaderSparkSim.getAppliedOutput());
+        elevatorSim.setInput(leaderSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage() 
+            + followerSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
 
-        elevatorSim.update(.02);
+        elevatorSim.update(0.020);
 
         encoderSim.setDistance(elevatorSim.getPositionMeters());
 
         RoboRioSim.setVInVoltage(
             BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
+
+        elevatorMech2d.setLength(encoder.getDistance());
+    }
+
+    public Command testElevatorCmd(){
+        return this.startEnd(() -> this.testElevator(5),() -> this.testElevator(0));
     }
 
     public void reachGoal(double goal){
@@ -89,6 +105,11 @@ public class ElevatorSubsystem extends SubsystemBase{
         double feedForward = 0.0;
 
         leaderSpark.setVoltage(pidOutput + feedForward);
+    }
+
+    public void testElevator(double voltage){
+        //[TODO] delete and look into logging
+        leaderSpark.setVoltage(voltage);
     }
 
     public void setSparkMaxConfig(){
@@ -101,12 +122,14 @@ public class ElevatorSubsystem extends SubsystemBase{
             .positionConversionFactor(ElevatorConstants.kPositionConversationFactor)
             .velocityConversionFactor(ElevatorConstants.kVelocityConversationFactor);
         leaderConfig.closedLoop
-            .feedbackSensor(ElevatorConstants.kFeedbackSensor)
+            //[TODO] feedbackSensor verisini constantstan ek
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
             .pid(ElevatorConstants.kP,ElevatorConstants.kI,ElevatorConstants.kD)
             .iZone(ElevatorConstants.kIZone);
 
         followerConfig
-            .inverted(ElevatorConstants.kLeaderMotorInvert)
+            .follow(ElevatorConstants.kLeaderSparkMaxCanId)
+            .inverted(ElevatorConstants.kFollowerMotorInvert)
             .smartCurrentLimit(ElevatorConstants.kSmartCurrent)
             .idleMode(ElevatorConstants.kIdleMode);
         followerConfig.encoder
@@ -114,7 +137,8 @@ public class ElevatorSubsystem extends SubsystemBase{
             .positionConversionFactor(ElevatorConstants.kPositionConversationFactor)
             .velocityConversionFactor(ElevatorConstants.kVelocityConversationFactor);
         followerConfig.closedLoop
-            .feedbackSensor(ElevatorConstants.kFeedbackSensor)
+            //[TODO] feedbackSensor verisini constantstan ek
+            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
             .pid(ElevatorConstants.kP,ElevatorConstants.kI,ElevatorConstants.kD)
             .iZone(ElevatorConstants.kIZone);
 
