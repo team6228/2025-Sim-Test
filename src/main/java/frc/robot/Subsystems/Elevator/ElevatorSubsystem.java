@@ -1,7 +1,20 @@
 package frc.robot.Subsystems.Elevator;
 
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.sim.SparkAbsoluteEncoderSim;
+import com.revrobotics.sim.SparkMaxAlternateEncoderSim;
 import com.revrobotics.sim.SparkMaxSim;
+import com.revrobotics.sim.SparkRelativeEncoderSim;
+import com.revrobotics.spark.SparkAbsoluteEncoder;
+import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkMaxAlternateEncoder;
+import com.revrobotics.spark.SparkRelativeEncoder;
+import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 
@@ -28,10 +41,14 @@ public class ElevatorSubsystem extends SubsystemBase{
     private final SparkMax leaderSpark = new SparkMax(ElevatorConstants.kLeaderSparkMaxCanId,
         ElevatorConstants.kLeaderMotorType);
 
+    private final SparkClosedLoopController controller = leaderSpark.getClosedLoopController();
+
     private final Encoder encoder = new Encoder(
         ElevatorConstants.kEncoderChannels[0],
         ElevatorConstants.kEncoderChannels[1],
         ElevatorConstants.kEncoderReversed);
+
+    private final RelativeEncoder sparkEncoder = leaderSpark.getEncoder(); 
 
     //[TODO] Feedback controllers
     //[TODO] May use pwm sim
@@ -46,16 +63,17 @@ public class ElevatorSubsystem extends SubsystemBase{
     ElevatorConstants.kMaxElevatorHeightMeters,
     true,
     0,
-    0.01,
+    0.001,
     0.0);
 
-    private final SparkMaxSim leaderSparkSim = new SparkMaxSim(leaderSpark, DCMotor.getNEO(1));
-    private final SparkMaxSim followerSparkSim = new SparkMaxSim(followerSpark, DCMotor.getNEO(1));
+    private final SparkMaxSim leaderSparkSim = new SparkMaxSim(leaderSpark, DCMotor.getNEO(2));
 
     private final EncoderSim encoderSim = new EncoderSim(encoder);
 
-    private final Mechanism2d mech2d = new Mechanism2d(20,50);
-    private final MechanismRoot2d mech2droot = mech2d.getRoot("Elevator root", 10, 0);
+    private SparkRelativeEncoderSim sparkEncoderSim = new SparkRelativeEncoderSim(leaderSpark);
+
+    private final Mechanism2d mech2d = new Mechanism2d(2,2);
+    private final MechanismRoot2d mech2droot = mech2d.getRoot("Elevator root", 1, 0);
     private final MechanismLigament2d elevatorMech2d = mech2droot.append(
         new MechanismLigament2d("Elevator", elevatorSim.getPositionMeters(), 90)
     );
@@ -78,11 +96,11 @@ public class ElevatorSubsystem extends SubsystemBase{
 
     @Override
     public void simulationPeriodic(){
+        sparkEncoderSim.setPosition(elevatorSim.getPositionMeters());
+
         //[TODO] may use sim motor
         //[TODO] may use something other than getVelocity
-        System.out.println(leaderSparkSim.getAppliedOutput());
-        elevatorSim.setInput(leaderSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage() 
-            + followerSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
+        elevatorSim.setInput(leaderSparkSim.getAppliedOutput() * RobotController.getBatteryVoltage());
 
         elevatorSim.update(0.020);
 
@@ -94,22 +112,13 @@ public class ElevatorSubsystem extends SubsystemBase{
         elevatorMech2d.setLength(encoder.getDistance());
     }
 
-    public Command testElevatorCmd(){
-        return this.startEnd(() -> this.testElevator(5),() -> this.testElevator(0));
+    public Command reachGoalCmd(double goal){
+        return this.run(() -> reachGoal(goal));
     }
 
     public void reachGoal(double goal){
         //[TODO] implement controller
-
-        double pidOutput = 0.0;
-        double feedForward = 0.0;
-
-        leaderSpark.setVoltage(pidOutput + feedForward);
-    }
-
-    public void testElevator(double voltage){
-        //[TODO] delete and look into logging
-        leaderSpark.setVoltage(voltage);
+        controller.setReference(goal, ControlType.kPosition);
     }
 
     public void setSparkMaxConfig(){
@@ -119,32 +128,24 @@ public class ElevatorSubsystem extends SubsystemBase{
             .idleMode(ElevatorConstants.kIdleMode);
         leaderConfig.encoder
         /*[TODO] constantstaki primary encoder yerine bizim encoder i koyma isi */
+            //.countsPerRevolution((int) ElevatorConstants.kEncoderCPR)
+            //.inverted(ElevatorConstants.kEncoderReversed)
             .positionConversionFactor(ElevatorConstants.kPositionConversationFactor)
             .velocityConversionFactor(ElevatorConstants.kVelocityConversationFactor);
         leaderConfig.closedLoop
             //[TODO] feedbackSensor verisini constantstan ek
-            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(ElevatorConstants.kP,ElevatorConstants.kI,ElevatorConstants.kD)
+            //[TODO] add this to constants
+            .outputRange(0, 1.25)
             .iZone(ElevatorConstants.kIZone);
-
+        //===================================
         followerConfig
-            .follow(ElevatorConstants.kLeaderSparkMaxCanId)
-            .inverted(ElevatorConstants.kFollowerMotorInvert)
-            .smartCurrentLimit(ElevatorConstants.kSmartCurrent)
-            .idleMode(ElevatorConstants.kIdleMode);
-        followerConfig.encoder
-        /*[TODO] constantstaki primary encoder yerine bizim encoder i koyma isi */
-            .positionConversionFactor(ElevatorConstants.kPositionConversationFactor)
-            .velocityConversionFactor(ElevatorConstants.kVelocityConversationFactor);
-        followerConfig.closedLoop
-            //[TODO] feedbackSensor verisini constantstan ek
-            .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-            .pid(ElevatorConstants.kP,ElevatorConstants.kI,ElevatorConstants.kD)
-            .iZone(ElevatorConstants.kIZone);
+            .follow(ElevatorConstants.kLeaderSparkMaxCanId);
 
         //[TODO] look in depth
-        leaderSpark.configure(leaderConfig, null, null);
-        followerSpark.configure(followerConfig, null, null);
+        leaderSpark.configure(leaderConfig,ResetMode.kResetSafeParameters,PersistMode.kPersistParameters);
+        followerSpark.configure(followerConfig,ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     /* 
