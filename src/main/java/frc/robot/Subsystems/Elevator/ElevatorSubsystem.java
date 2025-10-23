@@ -49,8 +49,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     0.01,
     0.0);
 
-    private final SparkMaxSim leaderSparkSim = new SparkMaxSim(leaderSpark, DCMotor.getNEO(1));
-    private final SparkMaxSim followerSparkSim = new SparkMaxSim(followerSpark, DCMotor.getNEO(1));
+    //Was ist das?????
 
     private final EncoderSim encoderSim = new EncoderSim(encoder);
 
