@@ -9,15 +9,16 @@ import edu.wpi.first.math.util.Units;
 
 public final class ElevatorConstants {
     public static final int kFollowerSparkMacCanId = 3;
+    public static final int kFollowerSparkMaxPort = 9;
     public static final MotorType kFollowerMotorType = MotorType.kBrushless;
     public static final boolean kFollowerMotorInvert = false;
     
     public static final int kLeaderSparkMaxCanId = 4;
+    public static final int kLeaderSparkMaxPort = 10;
     public static final MotorType kLeaderMotorType = MotorType.kBrushless;
     public static final boolean kLeaderMotorInvert = true;
 
     //Elevator sim stuff
-
     public static final double kMinElevatorHeightMeters = 0.0;
     public static final double kMaxElevatorHeightMeters = 1.25;
 
@@ -52,9 +53,9 @@ public final class ElevatorConstants {
     /*Feedback loop config */
     /*[TODO] dosya icindeki sensor bunun yerine kullanilabilir */
     public static final FeedbackSensor kFeedbackSensor = FeedbackSensor.kPrimaryEncoder;
-    public static final double kP = 1.0;
+    public static final double kP = 20.0;
     public static final double kI = 0.01;
-    public static final double kD = 0.25;
+    public static final double kD = 2.0;
     public static final double kIZone = 0.01;
 
     public static final double kS = 0.0;
