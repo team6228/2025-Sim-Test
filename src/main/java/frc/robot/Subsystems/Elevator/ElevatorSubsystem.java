@@ -40,7 +40,7 @@ public class ElevatorSubsystem extends SubsystemBase{
           ElevatorConstants.kP,
           ElevatorConstants.kI,
           ElevatorConstants.kD,
-          new TrapezoidProfile.Constraints(1.0, 1.0));
+          new TrapezoidProfile.Constraints(3.0, 3.0));
   ElevatorFeedforward feedforwardController =
       new ElevatorFeedforward(
           ElevatorConstants.kS,
@@ -90,8 +90,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void simulationPeriodic(){
         //[TODO] may use sim motor
         //[TODO] may use something other than getVelocity
-        elevatorSim.setInput(leaderSim.getSpeed() * RobotController.getBatteryVoltage() 
-        + followerSim.getSpeed() * RobotController.getBatteryVoltage());
+        elevatorSim.setInput(leaderSim.getSpeed() * RobotController.getBatteryVoltage() +
+            followerSim.getSpeed() * RobotController.getBatteryVoltage());
 
         elevatorSim.update(0.020);
 

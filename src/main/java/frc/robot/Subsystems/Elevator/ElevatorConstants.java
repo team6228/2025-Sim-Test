@@ -53,9 +53,9 @@ public final class ElevatorConstants {
     /*Feedback loop config */
     /*[TODO] dosya icindeki sensor bunun yerine kullanilabilir */
     public static final FeedbackSensor kFeedbackSensor = FeedbackSensor.kPrimaryEncoder;
-    public static final double kP = 5.0;
-    public static final double kI = 0.0;
-    public static final double kD = 0.0;
+    public static final double kP = 20.0;
+    public static final double kI = 0.01;
+    public static final double kD = 2.0;
     public static final double kIZone = 0.01;
 
     public static final double kS = 0.0;

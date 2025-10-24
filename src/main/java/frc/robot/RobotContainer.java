@@ -29,7 +29,10 @@ public class RobotContainer {
 
   private void configureBindings() {
     //[TODO] get button from constants
-    joystick.button(1).toggleOnTrue(mElevatorSubsystem.reachGoalCmd(1.0));
+    joystick.button(1).toggleOnTrue(mElevatorSubsystem.reachGoalCmd(1.25));
+    joystick.button(2).toggleOnTrue(mElevatorSubsystem.reachGoalCmd(1.0));
+    joystick.button(3).toggleOnTrue(mElevatorSubsystem.reachGoalCmd(0.5));
+    joystick.button(4).toggleOnTrue(mElevatorSubsystem.reachGoalCmd(0.0));
   }
 
   public Command getAutonomousCommand() {
