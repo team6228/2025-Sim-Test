@@ -109,6 +109,11 @@ public class ElevatorSubsystem extends SubsystemBase{
         RoboRioSim.setVInVoltage(
             BatterySim.calculateDefaultBatteryLoadedVoltage(elevatorSim.getCurrentDrawAmps()));
 
+        leaderSparkSim.iterate(
+            sparkEncoder.getVelocity(), 
+            RoboRioSim.getVInVoltage(),
+            0.02);
+
         elevatorMech2d.setLength(encoder.getDistance());
     }
 
@@ -116,9 +121,17 @@ public class ElevatorSubsystem extends SubsystemBase{
         return this.run(() -> reachGoal(goal));
     }
 
+    public Command stopCmd(){
+        return this.run(() -> stop());
+    }
+
     public void reachGoal(double goal){
         //[TODO] implement controller
-        controller.setReference(goal, ControlType.kPosition);
+        controller.setReference(goal, ControlType.kVelocity);
+    }
+
+    public void stop(){
+        leaderSpark.set(0);
     }
 
     public void setSparkMaxConfig(){
@@ -130,12 +143,13 @@ public class ElevatorSubsystem extends SubsystemBase{
         /*[TODO] constantstaki primary encoder yerine bizim encoder i koyma isi */
             //.countsPerRevolution((int) ElevatorConstants.kEncoderCPR)
             //.inverted(ElevatorConstants.kEncoderReversed)
-            .positionConversionFactor(ElevatorConstants.kPositionConversationFactor)
-            .velocityConversionFactor(ElevatorConstants.kVelocityConversationFactor);
+            .positionConversionFactor(1.0 / (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius))
+            .velocityConversionFactor(1.0 / (2 * Math.PI * ElevatorConstants.kElevatorDrumRadius));
         leaderConfig.closedLoop
             //[TODO] feedbackSensor verisini constantstan ek
             .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
             .pid(ElevatorConstants.kP,ElevatorConstants.kI,ElevatorConstants.kD)
+            .velocityFF(ElevatorConstants.kV/1000)
             //[TODO] add this to constants
             .outputRange(0, 1.25)
             .iZone(ElevatorConstants.kIZone);
