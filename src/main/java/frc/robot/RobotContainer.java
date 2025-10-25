@@ -13,7 +13,7 @@ import frc.robot.Commands.ArcadeDriveCmd;
 import frc.robot.Constants.OperatorConstants;
 
 import frc.robot.Subsystems.Drive.DriveSubsystem;
-import frc.robot.Subsystems.Elevator.ElevatorSubsystem;
+import frc.robot.Subsystems.Superstructure.Elevator.ElevatorSubsystem;
 
 public class RobotContainer {
   private final DriveSubsystem mDriveSubsystem = new DriveSubsystem();

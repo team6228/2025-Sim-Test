@@ -11,7 +11,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.Publisher;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.sendable.SendableRegistry;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
