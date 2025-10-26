@@ -9,17 +9,17 @@ import edu.wpi.first.math.util.Units;
 
 public final class ElevatorConstants {
     public static final int kFollowerSparkMacCanId = 3;
-    public static final int kFollowerSparkMaxPort = 9;
+    public static final int kFollowerSparkMaxPort = 6;
     public static final MotorType kFollowerMotorType = MotorType.kBrushless;
     public static final boolean kFollowerMotorInvert = false;
     
     public static final int kLeaderSparkMaxCanId = 4;
-    public static final int kLeaderSparkMaxPort = 10;
+    public static final int kLeaderSparkMaxPort = 7;
     public static final MotorType kLeaderMotorType = MotorType.kBrushless;
     public static final boolean kLeaderMotorInvert = true;
 
     //Elevator sim stuff
-    public static final double kMinElevatorHeightMeters = 0.0;
+    public static final double kMinElevatorHeightMeters = 0.00;
     public static final double kMaxElevatorHeightMeters = 1.25;
 
     public static final DCMotor kGearBox = DCMotor.getNEO(2);
@@ -57,6 +57,9 @@ public final class ElevatorConstants {
     public static final double kI = 0.01;
     public static final double kD = 2.0;
     public static final double kIZone = 0.01;
+
+    public static final double kMaxVelocity = 2.0;
+    public static final double kMaxAcceleration = 2.45;
 
     public static final double kS = 0.0;
     public static final double kG = 0.25;

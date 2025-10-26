@@ -35,8 +35,9 @@ public class ElevatorSubsystem extends SubsystemBase{
           ElevatorConstants.kP,
           ElevatorConstants.kI,
           ElevatorConstants.kD,
-          new TrapezoidProfile.Constraints(3.0, 3.0));
-  ElevatorFeedforward feedforwardController =
+          new TrapezoidProfile.Constraints(ElevatorConstants.kMaxVelocity, 
+            ElevatorConstants.kMaxAcceleration));
+    ElevatorFeedforward feedforwardController =
       new ElevatorFeedforward(
           ElevatorConstants.kS,
           ElevatorConstants.kG,
@@ -53,40 +54,31 @@ public class ElevatorSubsystem extends SubsystemBase{
     ElevatorConstants.kMaxElevatorHeightMeters,
     true,
     0,
-    0.001,
+    0.0001,
     0);
 
     private final EncoderSim encoderSim = new EncoderSim(encoder);
     private final PWMSim followerSim = new PWMSim(followerSpark);
     private final PWMSim leaderSim = new PWMSim(leaderSpark);
 
-    //[TODO look into them values]
-    private final Mechanism2d mech2d = new Mechanism2d(2,2);
-    private final MechanismRoot2d mech2droot = mech2d.getRoot("Elevator root", 1, 0);
-    private final MechanismLigament2d elevatorMech2d = mech2droot.append(
-        new MechanismLigament2d("Elevator", elevatorSim.getPositionMeters(), 90));
-    private final MechanismLigament2d armMech2d = elevatorMech2d.append(
-        new MechanismLigament2d("Arm", 30, 90));
-
     public ElevatorSubsystem() {
+
         encoder.reset();
         encoder.setDistancePerPulse(ElevatorConstants.kDistancePerPulse);
 
         leaderSpark.addFollower(followerSpark);
-
-        SmartDashboard.putData("Elevator Sim",mech2d);
     }
 
     @Override
     public void periodic(){
-        elevatorMech2d.setLength(encoder.getDistance());
     }
 
     @Override
     public void simulationPeriodic(){
         //[TODO] may use sim motor
         //[TODO] may use something other than getVelocity
-        elevatorSim.setInput(leaderSim.getSpeed() * RobotController.getBatteryVoltage());
+        elevatorSim.setInput(leaderSim.getSpeed() * RobotController.getBatteryVoltage() 
+            + followerSim.getSpeed() * RobotController.getBatteryVoltage());
 
         elevatorSim.update(0.020);
 
@@ -100,6 +92,14 @@ public class ElevatorSubsystem extends SubsystemBase{
         return this.run(() -> reachGoal(goal));
     }
 
+    public Command stopCmd(){
+        return this.run(() -> stop());
+    }
+
+    public Command holdPositionCmd(){
+        return this.run(() -> holdPosition());
+    }
+
     public void reachGoal(double goal){
         //[TODO] implement controller
 
@@ -110,6 +110,22 @@ public class ElevatorSubsystem extends SubsystemBase{
         double feedforwardOutput = feedforwardController.calculate(
             controller.getSetpoint().velocity);
         leaderSpark.setVoltage(pidOutput + feedforwardOutput);
+    }
+
+    public void holdPosition(){
+        reachGoal(encoder.getDistance());
+    }
+
+    public void stop(){
+        leaderSpark.stopMotor();
+    }
+
+    public double setElevatorSimLength(){
+        return encoder.getDistance()*100;
+    }
+
+    public ElevatorSim getSim(){
+        return elevatorSim;
     }
 
     /* 
