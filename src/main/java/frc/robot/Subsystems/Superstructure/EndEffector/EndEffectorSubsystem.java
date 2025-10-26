@@ -12,17 +12,12 @@ import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.simulation.PWMSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
-import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
-import edu.wpi.first.wpilibj.util.Color8Bit;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class EndEffectorSubsystem extends SubsystemBase{
-    private final PWMSparkMax intakeSpark = new PWMSparkMax(EndEffectorConstants.kIntakeSparkMaxPort);
+    //private final PWMSparkMax intakeSpark = new PWMSparkMax(EndEffectorConstants.kIntakeSparkMaxPort);
     private final PWMSparkMax rotationSpark = new PWMSparkMax(EndEffectorConstants.kRotationSparkMaxPort);
     
     private final Encoder encoder = new Encoder(
@@ -63,7 +58,7 @@ public class EndEffectorSubsystem extends SubsystemBase{
         0.001);
 
     private final EncoderSim encoderSim = new EncoderSim(encoder);
-    private final PWMSim intakeSim = new PWMSim(intakeSpark);
+    //private final PWMSim intakeSim = new PWMSim(intakeSpark);
     private final PWMSim rotationSim = new PWMSim(rotationSpark);
 
     //Dumb shit
