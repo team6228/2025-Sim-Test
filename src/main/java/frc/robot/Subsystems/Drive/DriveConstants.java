@@ -21,7 +21,7 @@ public final class DriveConstants {
     public static final double kMoiOfRobot = 7.5;
     public static final double kMassOfRobot = 60.0;
     public static final double kWheelDiameterMeters = Units.inchesToMeters(3);
-    public static final double kTrackWidthMeters = 0.69;
+    public static final double kTrackWidthMeters = 0.67;
 
     public static final int[] kRightEncoderChannels = {2,3};
     public static final boolean kRightEncoderReversed = false;

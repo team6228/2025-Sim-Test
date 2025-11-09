@@ -117,7 +117,8 @@ public class ElevatorSubsystem extends SubsystemBase{
     }
 
     public double setElevatorSimLength(){
-        return encoder.getDistance()*100;
+        //return encoder.getDistance()*100;
+        return encoder.getDistance();
     }
 
     public ElevatorSim getSim(){

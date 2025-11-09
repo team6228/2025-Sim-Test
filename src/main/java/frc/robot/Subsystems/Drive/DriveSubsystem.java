@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
@@ -77,7 +76,8 @@ public class DriveSubsystem extends SubsystemBase{
             DriveConstants.kMassOfRobot,
             DriveConstants.kWheelDiameterMeters,
             DriveConstants.kTrackWidthMeters,
-            VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005));
+            //VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005));
+            null);
 
         robotPose = driveOdometry.getPoseMeters();
 
@@ -125,7 +125,7 @@ public class DriveSubsystem extends SubsystemBase{
         return Math.IEEEremainder(gyro.getAngle(), 360) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
     }
 
-    public void arcadeDrive(double fwd,Double rot){
+    public void arcadeDriveDouble(double fwd,Double rot){
         robotDrive.arcadeDrive(fwd * DriveConstants.kFwdCap * DriveConstants.kFwdRot
         ,rot * DriveConstants.kRotCap * DriveConstants.kRotRot);
     }

@@ -27,7 +27,7 @@ public class ArcadeDriveCmd extends Command{
         Double fwd = mFwdFunction.get();
         double rot = mRotFunction.get();
 
-        mDriveSubsystem.arcadeDrive(fwd,rot);
+        mDriveSubsystem.arcadeDriveDouble(fwd,rot);
     }
 
     @Override

@@ -18,7 +18,7 @@ public final class EndEffectorConstants {
     //Arm sim
     public static final DCMotor kArmGearBox = DCMotor.getNEO(1);
     public static final double kArmReduction = 200;
-    public static final double kArmLength = Units.inchesToMeters(30);
+    public static final double kArmLength = .40;
     public static final double kArmMass = 8.0;
     public static final double kMinAngleRads = Units.degreesToRadians(0);
     public static final double kMaxAngleRads = Units.degreesToRadians(360);
