@@ -53,9 +53,9 @@ public class EndEffectorSubsystem extends SubsystemBase{
         EndEffectorConstants.kMinAngleRads,
         EndEffectorConstants.kMaxAngleRads,
         true,
-        0,
+        -20,
         EndEffectorConstants.kDistancePerPulse,
-        0.001);
+        0);
 
     private final EncoderSim encoderSim = new EncoderSim(encoder);
     //private final PWMSim intakeSim = new PWMSim(intakeSpark);
@@ -111,7 +111,8 @@ public class EndEffectorSubsystem extends SubsystemBase{
     }
 
     public void reachSetpoint(double setpoint){
-        controller.setGoal(setpoint);
+        System.out.println(setpoint);
+        controller.setGoal(Units.degreesToRadians(setpoint));
         double pidOutput = controller.calculate(encoder.getDistance());
         //Dumb shit
         controllerValue = pidOutput;

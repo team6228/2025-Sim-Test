@@ -50,7 +50,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     ElevatorConstants.kMaxElevatorHeightMeters,
     true,
     0,
-    0.0001,
+    0.000,
     0);
 
     private final EncoderSim encoderSim = new EncoderSim(encoder);
@@ -99,7 +99,7 @@ public class ElevatorSubsystem extends SubsystemBase{
     public void reachGoal(double goal){
         //[TODO] implement controller
 
-        controller.setGoal(goal);
+        controller.setGoal(goal / 3.0);
 
         // With the setpoint value we run PID control like normal
         double pidOutput = controller.calculate(encoder.getDistance());

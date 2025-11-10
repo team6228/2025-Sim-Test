@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase{
+    //[TODO] ZERO THE POSITION OF DRIVEBASE
     private final VictorSP leftMotor = new VictorSP(DriveConstants.kLeftMotorChannel); 
     private final VictorSP rightMotor = new VictorSP(DriveConstants.kRightMotorChannel);
 
@@ -49,7 +50,7 @@ public class DriveSubsystem extends SubsystemBase{
     private final Field2d fieldSim = new Field2d();
 
     StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
-            .getStructTopic("MyPose", Pose2d.struct).publish();
+        .getStructTopic("MyPose", Pose2d.struct).publish();
 
     private Pose2d robotPose;
 

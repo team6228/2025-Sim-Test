@@ -7,7 +7,7 @@ public final class DriveConstants {
     public static final double kFwdCap = 1.0;
     public static final double kFwdRot = -1.0;
 
-    public static final double kRotCap = 1.0;
+    public static final double kRotCap = 0.75;
     public static final double kRotRot = 1.0;
 
     public static final int kRightMotorChannel = 1;
@@ -17,10 +17,10 @@ public final class DriveConstants {
     public static final boolean kLeftMotorReversed = false;
 
     public static final DCMotor kDriveGearbox = DCMotor.getCIM(2);
-    public static final double kDriveGearing = 8;
-    public static final double kMoiOfRobot = 7.5;
-    public static final double kMassOfRobot = 60.0;
-    public static final double kWheelDiameterMeters = Units.inchesToMeters(3);
+    public static final double kDriveGearing = 10;
+    public static final double kMoiOfRobot = 4;
+    public static final double kMassOfRobot = 51.5;
+    public static final double kWheelDiameterMeters = 0.15;
     public static final double kTrackWidthMeters = 0.67;
 
     public static final int[] kRightEncoderChannels = {2,3};

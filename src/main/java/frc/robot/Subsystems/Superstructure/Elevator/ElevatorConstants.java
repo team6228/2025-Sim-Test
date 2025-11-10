@@ -20,7 +20,7 @@ public final class ElevatorConstants {
 
     //Elevator sim stuff
     public static final double kMinElevatorHeightMeters = 0.00;
-    public static final double kMaxElevatorHeightMeters = 1.25;
+    public static final double kMaxElevatorHeightMeters = 1.80 / 3.00   ;
 
     public static final DCMotor kGearBox = DCMotor.getNEO(2);
     public static final double kElevatorGearing = 10.0;

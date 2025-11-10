@@ -25,18 +25,27 @@ public class RobotContainer {
   public RobotContainer() {
     configureBindings();
 
-    mDrive.setDefaultCommand(new ArcadeDriveCmd(mDrive,() -> joystick.getRawAxis(1),() ->joystick.getRawAxis(0)));
+    mDrive.setDefaultCommand(new ArcadeDriveCmd(mDrive,() -> joystick.getRawAxis(1),() ->joystick.getRawAxis(2)));
   }
 
   private void configureBindings() {
     //[TODO] get button from constants
-    joystick.button(1).toggleOnTrue(mSuperstructure.reachGoalCmd(1.0));
-    joystick.button(2).toggleOnTrue(mSuperstructure.reachGoalCmd(0.5));
+    //Elevator
+    joystick.button(1).toggleOnTrue(mSuperstructure.reachGoalCmd(0.00));
+    joystick.button(2).toggleOnTrue(mSuperstructure.reachGoalCmd(0.50));
+    joystick.button(3).toggleOnTrue(mSuperstructure.reachGoalCmd(1.25));
+    joystick.button(4).toggleOnTrue(mSuperstructure.reachGoalCmd(1.80));
 
+    //Arm
+    joystick.pov(0).toggleOnTrue(mSuperstructure.reachSetpointCmd(-45.00));
+    joystick.pov(90).toggleOnTrue(mSuperstructure.reachSetpointCmd(0.00));
+    joystick.pov(180).toggleOnTrue(mSuperstructure.reachSetpointCmd(45.00));
+    joystick.pov(270).toggleOnTrue(mSuperstructure.reachSetpointCmd(90.00));
 
+    /* 
     joystick.button(3).toggleOnTrue(mSuperstructure.reachSetpointCmd(Units.degreesToRadians(45)));
     joystick.button(4).toggleOnTrue(mSuperstructure.reachSetpointCmd(Units.degreesToRadians(225)));
-    
+    */
   }
 
   public Command getAutonomousCommand() {
