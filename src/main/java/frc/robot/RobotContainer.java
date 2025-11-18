@@ -9,7 +9,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 
-import frc.robot.Commands.ArcadeDriveCmd;
+import frc.robot.Commands.CartesianDriveCmd;
+import frc.robot.Commands.PolarDriveCmd;
 
 import frc.robot.Constants.OperatorConstants;
 
@@ -25,26 +26,33 @@ public class RobotContainer {
   public RobotContainer() {
     configureBindings();
 
-    mDrive.setDefaultCommand(new ArcadeDriveCmd(mDrive,() -> joystick.getRawAxis(1),() ->joystick.getRawAxis(2)));
+    //Ps4
+    //mDrive.setDefaultCommand(new ArcadeDriveCmd(mDrive,() -> joystick.getRawAxis(1),() ->joystick.getRawAxis(2)));
+    //Keyboard
+    //mDrive.setDefaultCommand(new ArcadeDriveCmd(mDrive,() -> joystick.getRawAxis(1),() ->joystick.getRawAxis(0)));
   }
 
   private void configureBindings() {
     //[TODO] get button from constants
-    //Elevator
+    //Keyboard
+    
+    joystick.button(1).toggleOnTrue(mSuperstructure.reachGoalCmd(0.00));
+    joystick.button(2).toggleOnTrue(mSuperstructure.reachGoalCmd(1.20));
+
+    joystick.button(3).toggleOnTrue(mSuperstructure.reachSetpointCmd(-25.00));
+    joystick.button(4).toggleOnTrue(mSuperstructure.reachSetpointCmd(0.00));
+    
+    //Ps4
+    /* 
     joystick.button(1).toggleOnTrue(mSuperstructure.reachGoalCmd(0.00));
     joystick.button(2).toggleOnTrue(mSuperstructure.reachGoalCmd(0.50));
     joystick.button(3).toggleOnTrue(mSuperstructure.reachGoalCmd(1.25));
     joystick.button(4).toggleOnTrue(mSuperstructure.reachGoalCmd(1.80));
 
-    //Arm
     joystick.pov(0).toggleOnTrue(mSuperstructure.reachSetpointCmd(-45.00));
     joystick.pov(90).toggleOnTrue(mSuperstructure.reachSetpointCmd(0.00));
     joystick.pov(180).toggleOnTrue(mSuperstructure.reachSetpointCmd(45.00));
     joystick.pov(270).toggleOnTrue(mSuperstructure.reachSetpointCmd(90.00));
-
-    /* 
-    joystick.button(3).toggleOnTrue(mSuperstructure.reachSetpointCmd(Units.degreesToRadians(45)));
-    joystick.button(4).toggleOnTrue(mSuperstructure.reachSetpointCmd(Units.degreesToRadians(225)));
     */
   }
 

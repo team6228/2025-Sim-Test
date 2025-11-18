@@ -8,7 +8,11 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
+import edu.wpi.first.math.kinematics.MecanumDriveWheelPositions;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.util.sendable.SendableRegistry;
@@ -16,36 +20,55 @@ import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
-
+import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class DriveSubsystem extends SubsystemBase{
-    //[TODO] ZERO THE POSITION OF DRIVEBASE
-    private final VictorSP leftMotor = new VictorSP(DriveConstants.kLeftMotorChannel); 
-    private final VictorSP rightMotor = new VictorSP(DriveConstants.kRightMotorChannel);
+    private final VictorSP leftFrontMotor = new VictorSP(DriveConstants.kLeftFrontMotorChannel); 
+    private final VictorSP rightFrontMotor = new VictorSP(DriveConstants.kRightFrontMotorChannel);
+    private final VictorSP leftRearMotor = new VictorSP(DriveConstants.kLeftRearMotorChannel);
+    private final VictorSP rightRearMotor = new VictorSP(DriveConstants.kRightRearMotorChannel);
 
-    private final Encoder rightEncoder = new Encoder(
-        DriveConstants.kRightEncoderChannels[0],
-        DriveConstants.kRightEncoderChannels[1],
-        DriveConstants.kLeftEncoderReversed);
+    //[TODO] Edit
+    private final Translation2d frontLeftLocation = new Translation2d(0.381, 0.381);
+    private final Translation2d frontRightLocation = new Translation2d(0.381, -0.381);
+    private final Translation2d backLeftLocation = new Translation2d(-0.381, 0.381);
+    private final Translation2d backRightLocation = new Translation2d(-0.381, -0.381);
 
-    private final Encoder leftEncoder = new Encoder(
-        DriveConstants.kLeftEncoderChannels[0],
-        DriveConstants.kLeftEncoderChannels[1],
-        DriveConstants.kLeftEncoderReversed);
+    private final Encoder leftFrontEncoder = new Encoder(
+        DriveConstants.kLeftFrontEncoderChannels[0],
+        DriveConstants.kLeftFrontEncoderChannels[1],
+        DriveConstants.kLeftFrontEncoderReversed);
+
+    private final Encoder rightFrontEncoder = new Encoder(
+        DriveConstants.kRightFrontEncoderChannels[0],
+        DriveConstants.kRightFrontEncoderChannels[1],
+        DriveConstants.kRightFrontEncoderReversed);
+
+    private final Encoder leftRearEncoder = new Encoder(
+        DriveConstants.kLeftRearEncoderChannels[0],
+        DriveConstants.kLeftRearEncoderChannels[1],
+        DriveConstants.kLeftRearEncoderReversed);
+    
+    private final Encoder rightRearEncoder = new Encoder(
+        DriveConstants.kRightRearEncoderChannels[0],
+        DriveConstants.kRightRearEncoderChannels[1],
+        DriveConstants.kRightRearEncoderReversed);
 
     private final ADXRS450_Gyro gyro = new ADXRS450_Gyro();  
 
-    private final DifferentialDriveOdometry driveOdometry;
+    private final MecanumDriveOdometry driveOdometry;
+    private final MecanumDriveKinematics robotKinematics = new MecanumDriveKinematics(frontRightLocation, frontLeftLocation, backRightLocation, backLeftLocation);
+    private final MecanumDrive robotDrive = new MecanumDrive(leftFrontMotor::set, leftRearMotor::set, rightFrontMotor::set, rightRearMotor::set);
 
-    private final DifferentialDrive robotDrive = new DifferentialDrive(leftMotor::set, rightMotor::set);
-
-    private final EncoderSim rightEncoderSim = new EncoderSim(rightEncoder);
-    private final EncoderSim leftEncoderSim = new EncoderSim(leftEncoder);
+    private final EncoderSim leftFrontEncoderSim = new EncoderSim(leftFrontEncoder);
+    private final EncoderSim rightFrontEncoderSim = new EncoderSim(rightFrontEncoder);
+    private final EncoderSim leftRearEncoderSim = new EncoderSim(leftRearEncoder);
+    private final EncoderSim rightRearEncoderSim = new EncoderSim(rightRearEncoder);
 
     private final ADXRS450_GyroSim gyroSim = new ADXRS450_GyroSim(gyro);
 
-    private final DifferentialDrivetrainSim robotDriveSim;
+    //Robot drive sim
 
     private final Field2d fieldSim = new Field2d();
 
@@ -55,30 +78,30 @@ public class DriveSubsystem extends SubsystemBase{
     private Pose2d robotPose;
 
     public DriveSubsystem() {
-        SendableRegistry.addChild(robotDrive,rightMotor);
-        SendableRegistry.addChild(robotDrive,leftMotor);
+        SendableRegistry.addChild(robotDrive,leftFrontMotor);
+        SendableRegistry.addChild(robotDrive,rightFrontMotor);
+        SendableRegistry.addChild(robotDrive,leftRearMotor);
+        SendableRegistry.addChild(robotDrive,rightRearMotor);
 
-        rightMotor.setInverted(DriveConstants.kRightMotorReversed);
+        leftFrontMotor.setInverted(DriveConstants.kLeftFrontMotorReversed);
+        rightFrontMotor.setInverted(DriveConstants.kRightFrontMotorReversed);
+        leftRearMotor.setInverted(DriveConstants.kLeftRearMotorReversed);
+        rightRearMotor.setInverted(DriveConstants.kRightRearMotorReversed);
 
-        rightEncoder.setDistancePerPulse(DriveConstants.kDistancePerPulse);
-        leftEncoder.setDistancePerPulse(DriveConstants.kDistancePerPulse);
+        leftFrontEncoder.setDistancePerPulse(DriveConstants.kDistancePerPulse);
+        rightFrontEncoder.setDistancePerPulse(DriveConstants.kDistancePerPulse);
+        leftRearEncoder.setDistancePerPulse(DriveConstants.kDistancePerPulse);
+        rightRearEncoder.setDistancePerPulse(DriveConstants.kDistancePerPulse);
 
+        //Reset stuff
         resetEncoders();
+        gyro.reset();
 
-        driveOdometry = new DifferentialDriveOdometry(
-            Rotation2d.fromDegrees(getHeading()),
-            leftEncoder.getRate(),
-            rightEncoder.getRate());
-
-        robotDriveSim = new DifferentialDrivetrainSim(
-            DriveConstants.kDriveGearbox,
-            DriveConstants.kDriveGearing,
-            DriveConstants.kMoiOfRobot,
-            DriveConstants.kMassOfRobot,
-            DriveConstants.kWheelDiameterMeters,
-            DriveConstants.kTrackWidthMeters,
-            //VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005));
-            null);
+        //Kinematics,Odometry,Drive
+        driveOdometry = new MecanumDriveOdometry(robotKinematics, Rotation2d.fromDegrees(getHeading()), 
+            new MecanumDriveWheelPositions(
+                leftFrontEncoder.getDistance(),rightFrontEncoder.getDistance(),
+                leftRearEncoder.getDistance(),rightRearEncoder.getDistance()));
 
         robotPose = driveOdometry.getPoseMeters();
 
@@ -87,30 +110,18 @@ public class DriveSubsystem extends SubsystemBase{
 
     @Override
     public void periodic(){
-        driveOdometry.update(
-            Rotation2d.fromDegrees(getHeading()),
-            leftEncoder.getDistance(),
-            rightEncoder.getDistance());
+        var wheelPositions = new MecanumDriveWheelPositions(leftFrontEncoder.getDistance(),rightFrontEncoder.getDistance(),
+            leftRearEncoder.getDistance(),rightRearEncoder.getDistance());
+        driveOdometry.update(Rotation2d.fromDegrees(getHeading()),wheelPositions);
 
         fieldSim.setRobotPose(getPose());
     }
 
     @Override
     public void simulationPeriodic(){
-        robotDriveSim.setInputs(leftMotor.get() * RobotController.getBatteryVoltage(),
-            rightMotor.get() * RobotController.getBatteryVoltage());
-        robotDriveSim.update(0.020);
+        //[TODO] Set encoder,gyro sims
 
-        leftEncoderSim.setDistance(robotDriveSim.getLeftPositionMeters());
-        leftEncoderSim.setRate(robotDriveSim.getLeftVelocityMetersPerSecond());
-
-        rightEncoderSim.setDistance(robotDriveSim.getRightPositionMeters());
-        rightEncoderSim.setRate(robotDriveSim.getRightVelocityMetersPerSecond());
-
-        gyroSim.setAngle(robotDriveSim.getHeading().getDegrees());
-
-        robotPose = driveOdometry.getPoseMeters();
-        publisher.set(robotPose);
+        publisher.set(getPose());
     }
 
     public Pose2d getPose(){
@@ -118,16 +129,23 @@ public class DriveSubsystem extends SubsystemBase{
     }
 
     public void resetEncoders(){
-        rightEncoder.reset();
-        leftEncoder.reset();
+        leftFrontEncoder.reset();
+        rightFrontEncoder.reset();
+        leftRearEncoder.reset();
+        rightRearEncoder.reset();
     }
 
     public double getHeading(){
         return Math.IEEEremainder(gyro.getAngle(), 360) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
     }
 
-    public void arcadeDriveDouble(double fwd,Double rot){
-        robotDrive.arcadeDrive(fwd * DriveConstants.kFwdCap * DriveConstants.kFwdRot
-        ,rot * DriveConstants.kRotCap * DriveConstants.kRotRot);
+    public void cartesianDrive(Double speedX,Double speedY,Double rotationZ){
+        robotDrive.driveCartesian(speedX * DriveConstants.kWheelSpeedCap * -1.0,
+            speedY * DriveConstants.kWheelSpeedCap * -1.0,rotationZ * DriveConstants.kWheelSpeedCap * -1.0);
+    }
+
+    //[TODO] learn polar drive
+    public void polarDrive(){
+        robotDrive.drivePolar(0,Rotation2d.fromDegrees(0),0);
     }
 }

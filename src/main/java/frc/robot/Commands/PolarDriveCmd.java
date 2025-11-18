@@ -5,14 +5,12 @@ import java.util.function.Supplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Subsystems.Drive.DriveSubsystem;
 
-public class ArcadeDriveCmd extends Command{
+public class PolarDriveCmd extends Command{
     private final DriveSubsystem mDriveSubsystem;
-    private final Supplier<Double> mFwdFunction,mRotFunction;
+    //[TODO] add needed suppliers
 
-    public ArcadeDriveCmd(DriveSubsystem driveSubsystem, Supplier<Double> fwdFunction, Supplier<Double> rotFunction) {
+    public PolarDriveCmd(DriveSubsystem driveSubsystem){
         this.mDriveSubsystem = driveSubsystem;
-        this.mFwdFunction = fwdFunction;
-        this.mRotFunction = rotFunction;
 
         addRequirements(driveSubsystem);
     }
@@ -24,10 +22,7 @@ public class ArcadeDriveCmd extends Command{
 
     @Override
     public void execute(){
-        Double fwd = mFwdFunction.get();
-        double rot = mRotFunction.get();
-
-        mDriveSubsystem.arcadeDriveDouble(fwd,rot);
+        mDriveSubsystem.polarDrive();
     }
 
     @Override

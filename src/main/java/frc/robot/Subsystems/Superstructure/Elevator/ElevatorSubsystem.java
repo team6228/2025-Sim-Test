@@ -49,8 +49,6 @@ public class ElevatorSubsystem extends SubsystemBase{
     ElevatorConstants.kMinElevatorHeightMeters,
     ElevatorConstants.kMaxElevatorHeightMeters,
     true,
-    0,
-    0.000,
     0);
 
     private final EncoderSim encoderSim = new EncoderSim(encoder);
@@ -58,7 +56,6 @@ public class ElevatorSubsystem extends SubsystemBase{
     private final PWMSim leaderSim = new PWMSim(leaderSpark);
 
     public ElevatorSubsystem() {
-
         encoder.reset();
         encoder.setDistancePerPulse(ElevatorConstants.kDistancePerPulse);
 
